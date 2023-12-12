@@ -13,6 +13,7 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useNotesStore } from '@/store/noteStore'
 import { PlusCircleIcon } from '@heroicons/react/24/solid'
 import { Textarea } from '@nextui-org/input'
+
 export default function CreateModal() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure()
     const [noteForm, setNoteForm] = useState<NoteForm>({
@@ -26,7 +27,11 @@ export default function CreateModal() {
     const handleCreateNote = () => {
         addNote(noteForm)
 
-        setNoteForm({} as NoteForm)
+        setNoteForm((prevState) => ({
+            ...prevState,
+            name: '',
+            noteText: '',
+        }))
         onOpenChange()
     }
     const handleChangeTitle = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -94,14 +99,14 @@ export default function CreateModal() {
                                     variant='bordered'
                                     onChange={handleChangeEditor}
                                 />
-                                {noteForm.hashtags ? (
+                                {noteForm.hashtags.length ? (
                                     <p
                                         dangerouslySetInnerHTML={{
                                             __html: noteForm.hashtags.join(' '),
                                         }}
                                     />
                                 ) : (
-                                    <p>Нет текста</p>
+                                    <></>
                                 )}
                             </ModalBody>
                             <ModalFooter>

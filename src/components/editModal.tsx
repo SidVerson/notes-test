@@ -9,43 +9,14 @@ import {
     useDisclosure,
 } from '@nextui-org/modal'
 import { Button, Input } from '@nextui-org/react'
-import { ChangeEvent, FC, useState } from 'react'
+import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
 import { PencilIcon } from '@heroicons/react/20/solid'
 import { Textarea } from '@nextui-org/input'
-import * as ReactDOMServer from 'react-dom/server'
+import React from 'react'
 
 interface IEditNoteProps {
     note: NoteModel
     className: string
-}
-
-const TagHighlightInput: FC<{
-    value: string
-    onChange: (value: string) => void
-}> = ({ value, onChange }) => {
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
-        onChange(e.target.value)
-    }
-
-    const highlightTags = (text: string): JSX.Element[] => {
-        const parts = text.split(/(#\w+)/g)
-        return parts.map((part, index) =>
-            part.startsWith('#') ? (
-                <span key={index} className='text-primary'>
-                    {part}
-                </span>
-            ) : (
-                part
-            )
-        )
-    }
-
-    return (
-        <div>
-            <input type='text' value={value} onChange={handleInputChange} />
-            <div>{highlightTags(value)}</div>
-        </div>
-    )
 }
 
 export const EditModal: FC<IEditNoteProps> = ({ note }, className = '') => {
@@ -54,7 +25,7 @@ export const EditModal: FC<IEditNoteProps> = ({ note }, className = '') => {
     const [noteForm, setNoteForm] = useState<NoteForm>({
         name: note.name,
         noteText: note.noteText,
-        hashtags: [],
+        hashtags: note.hashtags || [],
     })
     const editNote = useNotesStore((state) => state.editNote)
     const notes = useNotesStore((state) => state.notes)
@@ -68,13 +39,21 @@ export const EditModal: FC<IEditNoteProps> = ({ note }, className = '') => {
     }
 
     const handleEditNote = (): void => {
-        editNote({
+        const combinedText = `${noteForm.name} ${noteForm.noteText}`
+        const tagMatches = combinedText.match(/#(\w+)/g)
+
+        const updatedNote = {
             ...note,
             name: noteForm.name,
             noteText: noteForm.noteText,
-        })
+            hashtags: tagMatches ? Array.from(new Set(tagMatches)) : [],
+        }
+
+        editNote(updatedNote)
         onOpenChange()
     }
+
+
 
     return (
         <>
@@ -103,20 +82,16 @@ export const EditModal: FC<IEditNoteProps> = ({ note }, className = '') => {
                                     label='Заголовок'
                                     placeholder='Введите заголовок модели'
                                     variant='bordered'
-                                    value={noteForm.name}  
-                                    onChange={handleInputChange}
-                                    startContent={noteForm.hashtags.join(' ')}
-                                />
-                                <TagHighlightInput
                                     value={noteForm.name}
                                     onChange={handleInputChange}
                                 />
+
                                 <Textarea
                                     label='Текст'
                                     placeholder='Введите текст заметки'
                                     variant='bordered'
-                                    value={noteForm.noteText}
                                     onChange={handleChangeEditor}
+                                    value={noteForm.noteText}
                                 />
                             </ModalBody>
                             <ModalFooter>
@@ -147,3 +122,4 @@ export const EditModal: FC<IEditNoteProps> = ({ note }, className = '') => {
         </>
     )
 }
+

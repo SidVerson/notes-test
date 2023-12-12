@@ -1,15 +1,7 @@
 'use client'
 import { FC, MouseEventHandler } from 'react'
-import { motion } from 'framer-motion'
 import { useNotesStore } from '@/store/noteStore'
 import { EditModal } from './editModal'
-import {
-    Dropdown,
-    DropdownTrigger,
-    DropdownMenu,
-    DropdownSection,
-    DropdownItem,
-} from '@nextui-org/dropdown'
 import { Card, CardHeader, CardBody, CardFooter } from '@nextui-org/card'
 import { Button } from '@nextui-org/button'
 import { TrashIcon } from '@heroicons/react/20/solid'
@@ -42,7 +34,7 @@ export const NoteItem: FC<INoteItemProps> = ({ note, searchTerm }) => {
         removeNote(note.id)
     }
     return (
-        <Card className='w-full h-full'>
+        <Card className=' min-w-[500px] max-h-[300px] min-h-[150px] snap-normal snap-center'>
             <CardHeader className='flex justify-between h-[40%]'>
                 <h1 className='font-bold text-2xl'>{note?.name}</h1>
                 <div>
@@ -58,7 +50,7 @@ export const NoteItem: FC<INoteItemProps> = ({ note, searchTerm }) => {
                 </div>
             </CardHeader>
             <Divider />
-            <CardBody className='h-fit'>
+            <CardBody className='h-fit overscroll-none'>
                 {note.noteText ? (
                     <p
                         dangerouslySetInnerHTML={{
